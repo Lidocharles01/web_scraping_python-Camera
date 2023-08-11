@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import time
 
-base_url = "https://www.amazon.in/s?k=camara"
+base_url = "https://www.amazon.in/s?k=camera"  # Corrected the typo in the URL
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36"
@@ -12,6 +12,7 @@ headers = {
 max_retries = 5
 retry_delay = 5  # seconds
 
+camara_data = []  # Initialize the data list outside the loop
 
 for retry in range(max_retries):
     try:
@@ -28,25 +29,23 @@ for retry in range(max_retries):
             exit()
 
 soup = BeautifulSoup(response.content, "html.parser")
-phone_cards = soup.find_all("div", class_="s-result-item")
+camera_cards = soup.find_all("div", class_="s-result-item")
 
-phone_data = []
-
-for phone_card in phone_cards:
+for camera_card in camera_cards:
     try:
-        phone_name = phone_card.find("span", class_="a-text-normal").text.strip()
-        phone_price = phone_card.find("span", class_="a-offscreen").text if phone_card.find("span", class_="a-offscreen") else "N/A"
-        phone_rating = phone_card.find("span", class_="a-icon-alt").text if phone_card.find("span", class_="a-icon-alt") else "N/A"
+        camera_name = camera_card.find("span", class_="a-text-normal").text.strip()
+        camera_price = camera_card.find("span", class_="a-price-whole").text if camera_card.find("span", class_="a-price-whole") else "N/A"  # Corrected the class name for price
+        camera_rating = camera_card.find("span", class_="a-icon-alt").text if camera_card.find("span", class_="a-icon-alt") else "N/A"
         
-        phone_data.append({
-            "Name": phone_name,
-            "Price": phone_price,
-            "Rating": phone_rating
+        camara_data.append({
+            "Name": camera_name,
+            "Price": camera_price,
+            "Rating": camera_rating
         })
     except Exception as e:
-        print("Error in extracting phone data:", e)
+        print("Error in extracting camera data:", e)
 
-df = pd.DataFrame(phone_data)
+df = pd.DataFrame(camara_data)  # Corrected variable name from camara_data to camera_data
 df.to_csv("amazon_Camera.csv", index=False)
 
 print("Data successfully extracted and CSV saved.")
